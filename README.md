@@ -20,7 +20,18 @@ El sistema resuelve la necesidad de calcular coincidencias entre perfiles olfati
 * **Cloud Carrier:** Proveedores de red y telecomunicaciones que garantizan el transporte seguro del tráfico HTTP/S.
 * **Impacto Económico:** La adopción del modelo *Pay-as-you-go* evita el sobredimensionamiento de servidores dedicados tradicionales, optimizando los costes operativos al escalar la infraestructura de forma elástica en función de la demanda real.
 
-## 4. Diagrama de Arquitectura de Referencia
+
+## 4. Especificación Sintética de la API REST
+
+A continuación se detallan los endpoints principales de la arquitectura de microservicios, definiendo las rutas, verbos HTTP y los payloads JSON esperados para las peticiones y respuestas:
+
+| Verbo HTTP | Ruta / Endpoint | Descripción | Request Payload (Entrada) | Response Payload (Salida) |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/perfumes` | Obtiene el catálogo paginado de perfumes y sus pirámides olfativas | *Ninguno* | `200 OK` — `[{"id": "perfume-01", "name": "Khamrah", "brand": "Lattafa", "top_notes": ["Canela"], "heart_notes": ["Praliné"], "base_notes": ["Vainilla"]}]` |
+| `GET` | `/api/v1/perfumes/{id}` | Consulta el detalle específico de un perfume por su identificador | *Ninguno* | `200 OK` (Objeto JSON del perfume) / `404 Not Found` (`{"detail": "Perfume not found"}`) |
+| `POST` | `/api/v1/recommendations` | Solicita el cálculo de recomendaciones olfativas basadas en un perfume o notas | `{"perfume_id": "perfume-01", "limit": 5}` | `200 OK` — `{"source_perfume": "perfume-01", "recommendations": [{"id": "perfume-08", "name": "Angels' Share", "similarity_score": 0.89}], "cached": true}` |
+
+## 5. Diagrama de Arquitectura de Referencia
 
 ```mermaid
 graph TD

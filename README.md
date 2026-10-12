@@ -14,7 +14,7 @@ El sistema resuelve la necesidad de calcular coincidencias entre perfiles olfati
 
 ## 3. Mapeo de Actores NIST SP 500-292 e Impacto Económico
 * **Cloud Consumer:** Clientes externos, aplicaciones cliente o herramientas de prueba de API (Swagger UI / Postman).
-* **Cloud Provider:** Plataforma de infraestructura en la nube (ej. AWS / Render / Railway) encargada de alojar los contenedores.
+* **Cloud Provider:** Plataforma de infraestructura en la nube encargada de alojar los contenedores.
 * **Cloud Broker:** Capa de orquestación y despliegue de infraestructura que gestiona la provisión del entorno.
 * **Cloud Auditor:** Herramientas de telemetría y supervisión del rendimiento y seguridad del sistema.
 * **Cloud Carrier:** Proveedores de red y telecomunicaciones que garantizan el transporte seguro del tráfico HTTP/S.

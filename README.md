@@ -31,13 +31,3 @@ graph TD
     Rec -->|Lee datos catálogo| Catalog
     Rec -->|Caché recomendaciones| Redis
 
-
-## 5. Especificación Sintética de la API REST
-
-A continuación se detallan los endpoints principales de la arquitectura de microservicios, definiendo las rutas, verbos HTTP y los payloads JSON esperados para las peticiones y respuestas:
-
-| Verbo HTTP | Ruta / Endpoint | Descripción | Request Payload (Entrada) | Response Payload (Salida) |
-| :--- | :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/perfumes` | Obtiene el catálogo paginado de perfumes y sus pirámides olfativas | *Ninguno* | `200 OK`<br>```json<br>[<br>  {<br>    "id": "perfume-01",<br>    "name": "Khamrah",<br>    "brand": "Lattafa",<br>    "top_notes": ["Canela", "Nuez moscada"],<br>    "heart_notes": ["Praliné", "Tuberosa"],<br>    "base_notes": ["Vainilla", "Haba tonka"]<br>  }<br>]<br>``` |
-| `GET` | `/api/v1/perfumes/{id}` | Consulta el detalle específico de un perfume por su identificador | *Ninguno* | `200 OK` (Objeto JSON del perfume) / `404 Not Found` (`{"detail": "Perfume not found"}`) |
-| `POST` | `/api/v1/recommendations` | Solicita el cálculo de recomendaciones olfativas basadas en un perfume o notas | ```json<br>{<br>  "perfume_id": "perfume-01",<br>  "limit": 5<br>}<br>``` | `200 OK`<br>```json<br>{<br>  "source_perfume": "perfume-01",<br>  "recommendations": [<br>    {<br>      "id": "perfume-08",<br>      "name": "Angels' Share",<br>      "similarity_score": 0.89<br>    }<br>  ],<br>  "cached": true<br>}<br>``` |

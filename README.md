@@ -1,9 +1,65 @@
 # ScentCraft - Plataforma de Perfumería de Nicho y Recomendación Olfativa
+# 1. Descripción del Dominio, Arquitectura Modular y Casos de Uso Principales
 
-## 1. Descripción del Dominio y Problema de Negocio
-ScentCraft es una Aplicación Nativa de la Nube (Cloud-Native Application) orientada a la catalogación y procesamiento de recomendaciones para perfumería de autor. En este sector, la búsqueda tradicional basada en marcas o nombres resulta insuficiente. La afinidad de una fragancia depende de la composición química de su pirámide olfativa (notas de salida, corazón y fondo). 
+## Descripción del Dominio y Problema de Negocio
+**ScentCraft** es una Aplicación Nativa de la Nube (*Cloud-Native Application*) orientada a la catalogación avanzada, gestión de comunidades y procesamiento de recomendaciones para la perfumería de autor y de nicho. En este sector, la búsqueda basada únicamente en nombres comerciales o marcas resulta insuficiente, ya que la afinidad entre fragancias depende de la composición química y la estructura de su **pirámide olfativa** (notas de salida, corazón y fondo).
 
-El sistema resuelve la necesidad de calcular coincidencias entre perfiles olfativos complejos sin ralentizar las operaciones de lectura habituales del catálogo, mediante una arquitectura distribuida y desacoplada basada en microservicios.
+El sistema resuelve la necesidad de calcular coincidencias complejas entre perfiles olfativos, gestionar armarios digitales de fragancias personales y mantener catálogos extensos sin bloquear las operaciones de lectura o cálculo, mediante una arquitectura distribuida, desacoplada y modular basada en microservicios.
+
+---
+
+## Arquitectura de Microservicios Modularizada
+
+Cada microservicio sigue el principio de **separación de responsabilidades** (SoC) mediante un patrón de diseño en capas (`app/models.py`, `app/api/`, `app/services.py`, `app/views/`), garantizando que la lógica de negocio, la persistencia, los endpoints REST y la capa de presentación no estén acoplados.
+
+### Componentes del Sistema:
+
+1. **`catalog-service` (Puerto 8000):**
+   * **Responsabilidad:** Gestión y consulta del catálogo de perfumería de nicho y sus pirámides olfativas.
+   * **Estructura Interna:** Routers dedicados a las rutas REST (`/api/v1/perfumes`), esquemas de datos Pydantic para la estructura olfativa y vistas HTML independientes.
+
+2. **`recommendation-service` (Puerto 8001):**
+   * **Responsabilidad:** Motor de cómputo e inteligencia de afinidad olfativa.
+   * **Estructura Interna:** Capa de servicios (`services.py`) con clientes HTTP asíncronos (`httpx`) para consultar `catalog-service`, algoritmos de similitud ponderada por capas de notas y panel gráfico interactivo.
+
+3. **`user-service` (Puerto 8002 / 8003):**
+   * **Responsabilidad:** Autenticación de usuarios, gestión de sesiones desacoplada y administración del Armario Olfativo ("Scent Wardrobe").
+   * **Estructura Interna:** Módulos de API separados para la autenticación (`auth_routes.py`) y la gestión de la colección personal (`wardrobe_routes.py`).
+
+4. **`Redis Cache` (Capa de Caché y Persistencia Cloud):**
+   * **Responsabilidad:** Optimización del rendimiento y reducción de latencia en peticiones concurrentes.
+   * **Función:** Almacena en memoria las recomendaciones calculadas con alta frecuencia para evitar recomputaciones innecesarias de CPU.
+
+---
+
+## Casos de Uso Principales (CU)
+
+A continuación se detallan los flujos de uso fundamentales del sistema:
+
+* **`CU01: Consulta de Catálogo y Pirámides Olfativas`**
+  * **Actor:** Cliente externo / Usuario final.
+  * **Descripción:** El usuario consulta la lista global de fragancias o la ficha técnica individual de un perfume, obteniendo el desglose de sus notas de salida, corazón y fondo.
+  * **Servicio involucrado:** `catalog-service`.
+
+* **`CU02: Cálculo y Solicitud de Recomendación Olfativa`**
+  * **Actor:** Cliente externo / Usuario final.
+  * **Descripción:** El usuario selecciona un perfume de referencia para obtener recomendaciones. El servicio analiza la intersección de notas olfativas y devuelve un ranking ordenado por porcentaje de similitud (`similarity_score`) y notas coincidentes.
+  * **Servicios involucrados:** `recommendation-service` y `catalog-service`.
+
+* **`CU03: Registro, Login y Autenticación de Usuario`**
+  * **Actor:** Cliente externo / Usuario final.
+  * **Descripción:** Permite a los usuarios crear una cuenta en la plataforma e iniciar sesión para obtener credenciales/tokens de acceso para gestionar sus datos privados.
+  * **Servicio involucrado:** `user-service`.
+
+* **`CU04: Gestión del Armario Olfativo Personal ("Scent Wardrobe")`**
+  * **Actor:** Usuario autenticado.
+  * **Descripción:** El usuario organiza su colección privada catalogando perfumes como *"Perfume de Firma"*, *"En Colección"* o *"Lista de Deseos"*.
+  * **Servicio involucrado:** `user-service`.
+
+* **`CU05: Optimización de Recomendaciones mediante Caché`**
+  * **Actor:** Sistema / `recommendation-service`.
+  * **Descripción:** Ante una solicitud de recomendación, el motor comprueba primero en Redis si el resultado ya fue calculado previamente, sirviendo la respuesta inmediatamente si existe en caché.
+  * **Servicios involucrados:** `recommendation-service` y `Redis Cache`.
 
 ## 2. Justificación según NIST SP 800-145 (5 Características Clave del Cloud)
 1. **Autoservicio bajo demanda (On-demand self-service):** Aprovisionamiento automático de contenedores e infraestructura sin requerir intervención humana directa con el proveedor de la nube.

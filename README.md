@@ -88,13 +88,39 @@ A continuación se detallan los endpoints principales de la arquitectura de micr
 | `POST` | `/api/v1/recommendations` | Solicita el cálculo de recomendaciones olfativas basadas en un perfume o notas | `{"perfume_id": "perfume-01", "limit": 5}` | `200 OK` — `{"source_perfume": "perfume-01", "recommendations": [{"id": "perfume-08", "name": "Angels' Share", "similarity_score": 0.89}], "cached": true}` |
 
 ## 5. Diagrama de Arquitectura de Referencia
+## 🏗️ Arquitectura del Sistema
+
+ScentCraft sigue una arquitectura orientada a **microservicios desacoplados** bajo el principio *Database per Service*. Cada servicio mantiene su propia responsabilidad y capa de datos independiente.
 
 ```mermaid
 graph TD
-    Client[Cliente / Swagger UI / Postman] -->|HTTP REST| Catalog[catalog-service REST API]
-    Client -->|HTTP REST| Rec[recommendation-service]
-    Catalog -->|Consultas SQL/NoSQL| DB[(PostgreSQL / MongoDB)]
-    Catalog -->|Guarda/Lee Caché| Redis[(Redis Cache)]
-    Rec -->|Lee datos catálogo| Catalog
-    Rec -->|Caché recomendaciones| Redis
+    subgraph Client Layer [Capa de Presentación Web]
+        UI_Cat[Web UI / View <br/> catalog-service:8000]
+        UI_Rec[Web UI / View <br/> recommendation-service:8001]
+        UI_Usr[Web UI / View <br/> user-service:8002]
+    end
 
+    subgraph Service Layer [Capa de Microservicios - FastAPI]
+        CS[catalog-service <br/> Port 8000]
+        RS[recommendation-service <br/> Port 8001]
+        US[user-service <br/> Port 8002]
+    end
+
+    subgraph Persistence Layer [Capa de Persistencia e Infraestructura]
+        DB_Cat[(SQLite DB <br/> catalog.db)]
+        DB_Usr[(SQLite DB <br/> user.db)]
+        RedisCache[(Redis Cache <br/> Port 6379)]
+    end
+
+    %% Interacciones de Interfaz Web a API
+    UI_Cat -->|Local Route| CS
+    UI_Rec -->|Local Route| RS
+    UI_Usr -->|Local Route| US
+
+    %% Comunicación Inter-Servicio (HTTP Asíncrono / httpx)
+    RS -->|HTTP Async GET /api/v1/perfumes| CS
+
+    %% Acceso a Persistencia
+    CS -->|SQLAlchemy ORM| DB_Cat
+    US -->|SQLAlchemy ORM| DB_Usr
+    RS -.->|Caché de recomendaciones| RedisCache

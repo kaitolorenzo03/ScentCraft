@@ -140,7 +140,7 @@ graph TD
 ```
 ---
 
-## 6. 🐳 Despliegue con Docker Compose (Hito 2)
+## 6.Despliegue con Docker Compose (Hito 2)
 
 El sistema se ejecuta en un entorno multicontenedor completamente orquestado con `docker-compose.yaml`, enlazado mediante una red puente privada (`scentcraft-net`).
 

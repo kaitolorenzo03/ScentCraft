@@ -144,7 +144,7 @@ graph TD
 
 El sistema se ejecuta en un entorno multicontenedor completamente orquestado con `docker-compose.yaml`, enlazado mediante una red puente privada (`scentcraft-net`).
 
-### 📐 Resumen del Clúster de Microservicios
+### Resumen del Clúster de Microservicios
 
 | Microservicio | Puerto Expuesto | Descripción | Persistencia / Volumen |
 | :--- | :--- | :--- | :--- |
@@ -154,7 +154,7 @@ El sistema se ejecuta en un entorno multicontenedor completamente orquestado con
 
 ---
 
-### 🚀 Instrucciones de Ejecución y Gestión
+### Instrucciones de Ejecución y Gestión
 
 #### 1. Reconstruir e Iniciar el Clúster
 Para compilar los `Dockerfile` con usuario no-root (`appuser`) y arrancar todos los servicios en segundo plano:

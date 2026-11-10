@@ -137,3 +137,28 @@ graph TD
     CS -->|SQLAlchemy ORM| DB_Cat
     US -->|SQLAlchemy ORM| DB_Usr
     RS -.->|Caché de recomendaciones| RedisCache
+
+---
+
+## 🐳 Despliegue con Docker Compose (Hito 2)
+
+El proyecto está estructurado en una arquitectura de microservicios desacoplados expuestos mediante `docker-compose.yaml` en una red puente común (`scentcraft-net`).
+
+### 📐 Arquitectura del Sistema
+
+| Microservicio | Puerto | Descripción | Base de Datos |
+| :--- | :--- | :--- | :--- |
+| **`catalog-service`** | `8000` | Catálogo central de perfumes y notas olfativas (API + UI). | SQLite (Persistente en `catalog_data`) |
+| **`recommendation-service`** | `8001` | Motor asíncrono de cálculo de similitud olfativa. | N/A (Consulta a `catalog-service`) |
+| **`user-service`** | `8002` | Gestión de usuarios, autenticación y Armario Olfativo (API + UI). | SQLite (Persistente en `user_data`) |
+
+---
+
+### 🚀 Instrucciones de Ejecución
+
+#### 1. Reconstruir e Iniciar el Clúster
+
+Para compilar las imágenes y levantar todos los servicios en segundo plano:
+
+```powershell
+docker compose up --build -d

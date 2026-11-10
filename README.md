@@ -59,7 +59,7 @@ A continuación se detallan los flujos de uso fundamentales del sistema:
 
 - **`CU05: Optimización de Recomendaciones mediante Caché`**
   * **Actor:** Sistema / `recommendation-service`.
-  * **Descripción:** Ante una solicitud de recomendación, el motor comprueba primero en Redis si el resultado ya fue calculated previamente, sirviendo la respuesta inmediatamente si existe en caché.
+  * **Descripción:** Ante una solicitud de recomendación, el motor comprueba primero en Redis si el resultado ya fue calculado previamente, sirviendo la respuesta inmediatamente si existe en caché.
   * **Servicios involucrados:** `recommendation-service` y `Redis Cache`.
 
 ---
@@ -137,28 +137,30 @@ graph TD
     CS -->|SQLAlchemy ORM| DB_Cat
     US -->|SQLAlchemy ORM| DB_Usr
     RS -.->|Caché de recomendaciones| RedisCache
-
+```
 ---
 
-## 🐳 Despliegue con Docker Compose (Hito 2)
+## 6. 🐳 Despliegue con Docker Compose (Hito 2)
 
-El proyecto está estructurado en una arquitectura de microservicios desacoplados expuestos mediante `docker-compose.yaml` en una red puente común (`scentcraft-net`).
+El sistema se ejecuta en un entorno multicontenedor completamente orquestado con `docker-compose.yaml`, enlazado mediante una red puente privada (`scentcraft-net`).
 
-### 📐 Arquitectura del Sistema
+### 📐 Resumen del Clúster de Microservicios
 
-| Microservicio | Puerto | Descripción | Base de Datos |
+| Microservicio | Puerto Expuesto | Descripción | Persistencia / Volumen |
 | :--- | :--- | :--- | :--- |
-| **`catalog-service`** | `8000` | Catálogo central de perfumes y notas olfativas (API + UI). | SQLite (Persistente en `catalog_data`) |
-| **`recommendation-service`** | `8001` | Motor asíncrono de cálculo de similitud olfativa. | N/A (Consulta a `catalog-service`) |
-| **`user-service`** | `8002` | Gestión de usuarios, autenticación y Armario Olfativo (API + UI). | SQLite (Persistente en `user_data`) |
+| **`catalog-service`** | `8000` | Catálogo central de fragancias y notas olfativas (API + Web UI). | SQLite (`catalog_data:/app/data`) |
+| **`recommendation-service`** | `8001` | Motor de cómputo e inteligencia de similitud. | N/A (Consulta interna HTTP) |
+| **`user-service`** | `8002` | Gestión de cuentas, autenticación y Armario Olfativo (API + Web UI). | SQLite (`user_data:/app/data`) |
 
 ---
 
-### 🚀 Instrucciones de Ejecución
+### 🚀 Instrucciones de Ejecución y Gestión
 
 #### 1. Reconstruir e Iniciar el Clúster
-
-Para compilar las imágenes y levantar todos los servicios en segundo plano:
+Para compilar los `Dockerfile` con usuario no-root (`appuser`) y arrancar todos los servicios en segundo plano:
 
 ```powershell
-docker compose up --build -d
+docker compose up --build -d  
+
+
+

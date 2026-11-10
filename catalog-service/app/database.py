@@ -1,6 +1,7 @@
 import json
 import os
-from sqlalchemy import create_engine, Column, String, Text
+
+from sqlalchemy import Column, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 

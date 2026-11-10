@@ -1,6 +1,6 @@
-from fastapi import APIRouter
 from app.models import RecommendationRequest, RecommendationResponse
 from app.services import generate_recommendations
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/api/v1/recommendations", tags=["Recommendations"])
 

@@ -1,9 +1,9 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth_routes import router as auth_router
 from app.api.wardrobe_routes import router as wardrobe_router
-from app.views.web import router as web_router
 from app.database import init_db
+from app.views.web import router as web_router
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Inicializar la base de datos user.db en /app/data al arrancar
 init_db()

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from sqlalchemy.orm import Session
+from app.database import UserModel, WardrobeItemModel, get_db
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from app.database import get_db, UserModel, WardrobeItemModel
+from sqlalchemy.orm import Session
 
 # Asegúrate de mantener este prefijo exacto para que coincida con la llamada del HTML
 router = APIRouter(prefix="/api/v1/auth", tags=["Autenticación y Usuarios"])

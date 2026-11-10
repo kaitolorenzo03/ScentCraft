@@ -1,9 +1,9 @@
 import json
+
+from app.database import PerfumeModel, get_db
+from app.models import Perfume
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
-from app.models import Perfume
-from app.database import get_db, PerfumeModel
 
 router = APIRouter(prefix="/api/v1/perfumes", tags=["Perfumes"])
 
@@ -17,7 +17,7 @@ def format_perfume(p: PerfumeModel) -> Perfume:
         base_notes=json.loads(p.base_notes)
     )
 
-@router.get("", response_model=List[Perfume])
+@router.get("", response_model=list[Perfume])
 def get_perfumes(db: Session = Depends(get_db)):
     perfumes = db.query(PerfumeModel).all()
     return [format_perfume(p) for p in perfumes]

@@ -1,8 +1,8 @@
+from app.api.routes import router as api_router
+from app.database import init_db
+from app.views.web import router as web_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import router as api_router
-from app.views.web import router as web_router
-from app.database import init_db
 
 init_db()
 

@@ -1,5 +1,6 @@
+
 from pydantic import BaseModel
-from typing import List
+
 
 class RecommendationRequest(BaseModel):
     reference_perfume_id: str
@@ -9,8 +10,8 @@ class RecommendationItem(BaseModel):
     name: str
     brand: str
     similarity_score: float
-    matching_notes: List[str]
+    matching_notes: list[str]
 
 class RecommendationResponse(BaseModel):
     reference_perfume_id: str
-    recommendations: List[RecommendationItem]
+    recommendations: list[RecommendationItem]

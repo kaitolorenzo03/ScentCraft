@@ -1,15 +1,15 @@
 import os
+
 import httpx
-from typing import List, Dict
-from fastapi import HTTPException
 from app.models import RecommendationItem
+from fastapi import HTTPException
 
 # Lee la URL desde la variable de entorno de Docker Compose.
 # Si no existe, usa por defecto el nombre del servicio en la red de Docker (catalog-service).
 BASE_CATALOG_URL = os.getenv("CATALOG_SERVICE_URL", "http://catalog-service:8000")
 CATALOG_SERVICE_URL = f"{BASE_CATALOG_URL.rstrip('/')}/api/v1/perfumes"
 
-async def fetch_catalog() -> List[Dict]:
+async def fetch_catalog() -> list[dict]:
     """Consulta de forma asíncrona el microservicio de catálogo."""
     async with httpx.AsyncClient() as client:
         try:
@@ -23,7 +23,7 @@ async def fetch_catalog() -> List[Dict]:
                 detail="El servicio de catálogo (catalog-service) no está disponible"
             )
 
-def calculate_similarity(target: Dict, candidate: Dict) -> RecommendationItem:
+def calculate_similarity(target: dict, candidate: dict) -> RecommendationItem:
     """Calcula la coincidencia de notas olfativas entre dos perfumes."""
     target_notes = set(target["top_notes"] + target["heart_notes"] + target["base_notes"])
     candidate_notes = set(candidate["top_notes"] + candidate["heart_notes"] + candidate["base_notes"])
@@ -41,7 +41,7 @@ def calculate_similarity(target: Dict, candidate: Dict) -> RecommendationItem:
         matching_notes=list(intersection)
     )
 
-async def generate_recommendations(reference_id: str) -> List[RecommendationItem]:
+async def generate_recommendations(reference_id: str) -> list[RecommendationItem]:
     """Genera el ranking de recomendaciones filtrado y ordenado."""
     catalog = await fetch_catalog()
     

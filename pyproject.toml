@@ -1,0 +1,5 @@
+[tool.ruff]
+lint.ignore = [
+    "B008",   # Permitir Depends(...) en parámetros por defecto de FastAPI
+    "EXE002", # Permitir archivos ejecutables sin shebang
+]

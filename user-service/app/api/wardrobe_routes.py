@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from sqlalchemy.orm import Session
+from app.database import UserModel, WardrobeItemModel, get_db
 from app.models import WardrobeItem, WardrobeResponse
-from app.database import get_db, WardrobeItemModel, UserModel
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/v1/users", tags=["Armario Olfativo"])
 

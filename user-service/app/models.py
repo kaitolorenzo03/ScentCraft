@@ -1,5 +1,6 @@
+
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+
 
 class UserRegister(BaseModel):
     username: str
@@ -23,4 +24,4 @@ class WardrobeItem(BaseModel):
 
 class WardrobeResponse(BaseModel):
     username: str
-    items: List[WardrobeItem]
+    items: list[WardrobeItem]

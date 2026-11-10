@@ -17,8 +17,8 @@ async def recommendation_ui():
             h1 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
             p.subtitle { text-align: center; color: #7f8c8d; margin-bottom: 25px; }
             .control-panel { background: #ebf5fb; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #aed6f1; }
-            select, button { padding: 10px 15px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; }
-            button { background: #2980b9; color: white; border: none; font-weight: bold; cursor: pointer; }
+            select, button { padding: 10px 15px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; width: 100%; max-width: 400px; }
+            button { background: #2980b9; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; width: auto; }
             button:hover { background: #1f618d; }
             .card { border: 1px solid #e1e8ed; border-radius: 10px; padding: 15px; margin-bottom: 15px; background: #fafbfc; }
             .score-badge { background: #27ae60; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
@@ -32,11 +32,10 @@ async def recommendation_ui():
             <p class="subtitle">Cómputo de Afinidad y Coincidencia de Notas</p>
             
             <div class="control-panel">
-                <label><b>Selecciona tu perfume favorito:</b></label><br><br>
+                <label for="perfume-select"><b>Selecciona tu perfume favorito:</b></label><br><br>
+                <!-- El desplegable se carga dinámicamente -->
                 <select id="perfume-select">
-                    <option value="khamrah-01">Lattafa - Khamrah</option>
-                    <option value="encre-noire-02">Lalique - Encre Noire</option>
-                    <option value="angels-share-03">By Kilian - Angels' Share</option>
+                    <option value="">Cargando catálogo completo...</option>
                 </select>
                 <button onclick="obtenerRecomendaciones()">Calcular Similitud</button>
             </div>
@@ -45,9 +44,36 @@ async def recommendation_ui():
         </div>
 
         <script>
+            // Cargar el catálogo dinámicamente desde el catalog-service al abrir la página
+            document.addEventListener("DOMContentLoaded", async () => {
+                const select = document.getElementById('perfume-select');
+                try {
+                    // Consulta la API de catálogo en vivo apuntando a localhost:8000
+                    const res = await fetch('http://localhost:8000/api/v1/perfumes');
+                    if (!res.ok) throw new Error("Error al obtener catálogo");
+                    const perfumes = await res.json();
+
+                    select.innerHTML = '';
+                    perfumes.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.textContent = `${p.brand} - ${p.name}`;
+                        select.appendChild(opt);
+                    });
+                } catch (e) {
+                    select.innerHTML = '<option value="">Error cargando catálogo (Verifica catalog-service en puerto 8000)</option>';
+                }
+            });
+
             async function obtenerRecomendaciones() {
                 const selectedId = document.getElementById('perfume-select').value;
                 const container = document.getElementById('results-list');
+                
+                if (!selectedId) {
+                    container.innerHTML = "<p style='color:red;'>Por favor selecciona un perfume válido.</p>";
+                    return;
+                }
+
                 container.innerHTML = "<p>Calculando afinidades olfativas...</p>";
 
                 try {
@@ -59,8 +85,8 @@ async def recommendation_ui():
                     
                     const data = await res.json();
                     
-                    if(!res.ok) {
-                        container.innerHTML = `<p style="color:red;">Error: ${data.detail}</p>`;
+                    if (!res.ok) {
+                        container.innerHTML = `<p style="color:red;">Error: ${data.detail || 'El servicio de catálogo (catalog-service) no está disponible'}</p>`;
                         return;
                     }
 
@@ -87,7 +113,7 @@ async def recommendation_ui():
                     });
                     container.innerHTML = html;
                 } catch (e) {
-                    container.innerHTML = "<p style='color:red;'>Asegúrate de que catalog-service está arrancado en el puerto 8000.</p>";
+                    container.innerHTML = "<p style='color:red;'>Error al procesar las recomendaciones.</p>";
                 }
             }
         </script>

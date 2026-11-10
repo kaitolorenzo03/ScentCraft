@@ -1,21 +1,43 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from sqlalchemy.orm import Session
 from app.models import WardrobeItem, WardrobeResponse
-from app.database import WARDROBE_DB
+from app.database import get_db, WardrobeItemModel, UserModel
 
 router = APIRouter(prefix="/api/v1/users", tags=["Armario Olfativo"])
 
 @router.get("/{username}/wardrobe", response_model=WardrobeResponse)
-def get_wardrobe(username: str):
-    items = WARDROBE_DB.get(username, [])
-    return WardrobeResponse(username=username, items=items)
+def get_wardrobe(username: str, db: Session = Depends(get_db)):
+    items = db.query(WardrobeItemModel).filter(WardrobeItemModel.username == username).all()
+    formatted_items = [
+        WardrobeItem(
+            perfume_id=i.perfume_id,
+            perfume_name=i.perfume_name,
+            brand=i.brand,
+            category=i.category
+        ) for i in items
+    ]
+    return WardrobeResponse(username=username, items=formatted_items)
 
 @router.post("/{username}/wardrobe", status_code=status.HTTP_201_CREATED)
-def add_to_wardrobe(username: str, item: WardrobeItem):
-    if username not in WARDROBE_DB:
-        WARDROBE_DB[username] = []
-    
-    # Evitar duplicados del mismo perfume
-    WARDROBE_DB[username] = [i for i in WARDROBE_DB[username] if i["perfume_id"] != item.perfume_id]
-    WARDROBE_DB[username].append(item.dict())
-    
+def add_to_wardrobe(username: str, item: WardrobeItem, db: Session = Depends(get_db)):
+    user = db.query(UserModel).filter(UserModel.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    db.query(WardrobeItemModel).filter(
+        WardrobeItemModel.username == username,
+        WardrobeItemModel.perfume_id == item.perfume_id
+    ).delete()
+
+    item_id = f"{username}-{item.perfume_id}"
+    new_item = WardrobeItemModel(
+        id=item_id,
+        username=username,
+        perfume_id=item.perfume_id,
+        perfume_name=item.perfume_name,
+        brand=item.brand,
+        category=item.category
+    )
+    db.add(new_item)
+    db.commit()
     return {"message": f"Perfume '{item.perfume_name}' añadido al armario de {username}"}

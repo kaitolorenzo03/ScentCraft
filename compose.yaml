@@ -1,0 +1,53 @@
+services:
+  catalog-service:
+    build:
+      context: ./catalog-service
+      dockerfile: Dockerfile
+    container_name: scentcraft-catalog
+    ports:
+      - "${CATALOG_PORT:-8000}:8000"
+    volumes:
+      - catalog_data:/app/data
+    networks:
+      - scentcraft-net
+    restart: unless-stopped
+
+  recommendation-service:
+    build:
+      context: ./recommendation-service
+      dockerfile: Dockerfile
+    container_name: scentcraft-recommendation
+    ports:
+      - "${RECOMMENDATION_PORT:-8001}:8001"
+    environment:
+      - CATALOG_SERVICE_URL=http://catalog-service:8000
+    networks:
+      - scentcraft-net
+    depends_on:
+      - catalog-service
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: scentcraft-user
+    ports:
+      - "${USER_PORT:-8002}:8002"
+    environment:
+      - CATALOG_SERVICE_URL=http://catalog-service:8000
+    volumes:
+      - user_data:/app/data
+    networks:
+      - scentcraft-net
+    depends_on:
+      - catalog-service
+    restart: unless-stopped
+
+networks:
+  scentcraft-net:
+    driver: bridge
+
+volumes:
+  catalog_data:
+  user_data:

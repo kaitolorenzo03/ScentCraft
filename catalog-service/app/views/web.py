@@ -16,64 +16,75 @@ async def catalog_ui():
             .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
             h1 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
             p.subtitle { text-align: center; color: #7f8c8d; margin-bottom: 25px; }
-            .card { border: 1px solid #e1e8ed; border-radius: 10px; padding: 20px; margin-bottom: 20px; background: #fafbfc; }
-            .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-bottom: 15px; }
-            .brand { color: #8e44ad; font-weight: bold; font-size: 14px; text-transform: uppercase; }
-            .title { margin: 0; color: #2c3e50; font-size: 20px; }
-            .pyramid-section { margin-top: 8px; font-size: 14px; }
-            .pyramid-label { font-weight: bold; width: 80px; display: inline-block; color: #555; }
-            .tag { background: #eef2f5; padding: 4px 8px; border-radius: 4px; display: inline-block; margin: 2px; font-size: 13px; border: 1px solid #dcdfe3; }
-            .tag-top { background: #fef9e7; color: #7d6608; border-color: #f9e79f; }
-            .tag-heart { background: #fbeee6; color: #7e5109; border-color: #f5cba7; }
-            .tag-base { background: #eaeded; color: #2e4053; border-color: #d5dbdb; }
+            input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; margin-bottom: 20px; box-sizing: border-box; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+            .card { border: 1px solid #e1e8ed; border-radius: 8px; padding: 15px; background: #fafbfc; }
+            .brand { color: #2980b9; font-weight: bold; font-size: 13px; text-transform: uppercase; }
+            .name { margin: 5px 0; font-size: 16px; color: #2c3e50; }
+            .notes { font-size: 12px; color: #555; margin-top: 8px; }
+            .tag { background: #eef2f5; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px; }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>📚 ScentCraft - Catálogo</h1>
-            <p class="subtitle">Colección de Perfumería de Autor y Pirámides Olfativas</p>
-            <div id="catalog-list"></div>
+            <h1>📚 ScentCraft - Catálogo de Fragancias</h1>
+            <p class="subtitle">Explora las 100 fragancias de autor registradas en SQLite</p>
+            
+            <input type="text" id="search-input" placeholder="🔍 Buscar por nombre, marca o nota (ej: Tom Ford, Vainilla, Oud)..." oninput="filtrarPerfumes()">
+
+            <div id="catalog-grid" class="grid">
+                <p>Cargando catálogo...</p>
+            </div>
         </div>
 
         <script>
-            async function cargarCatalogo() {
-                const container = document.getElementById('catalog-list');
+            let perfumesData = [];
+
+            document.addEventListener("DOMContentLoaded", async () => {
                 try {
                     const res = await fetch('/api/v1/perfumes');
-                    const perfumes = await res.json();
-                    
-                    let html = '';
-                    perfumes.forEach(p => {
-                        html += `
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <span class="brand">${p.brand}</span>
-                                        <h3 class="title">${p.name}</h3>
-                                    </div>
-                                    <span style="color:#aaa; font-size:12px;">ID: ${p.id}</span>
-                                </div>
-                                <div class="pyramid-section">
-                                    <span class="pyramid-label">Salida:</span>
-                                    ${p.top_notes.map(n => `<span class="tag tag-top">${n}</span>`).join('')}
-                                </div>
-                                <div class="pyramid-section">
-                                    <span class="pyramid-label">Corazón:</span>
-                                    ${p.heart_notes.map(n => `<span class="tag tag-heart">${n}</span>`).join('')}
-                                </div>
-                                <div class="pyramid-section">
-                                    <span class="pyramid-label">Fondo:</span>
-                                    ${p.base_notes.map(n => `<span class="tag tag-base">${n}</span>`).join('')}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    container.innerHTML = html;
+                    perfumesData = await res.json();
+                    renderPerfumes(perfumesData);
                 } catch (e) {
-                    container.innerHTML = "<p style='color:red; text-align:center;'>Error al cargar el catálogo.</p>";
+                    document.getElementById('catalog-grid').innerHTML = "<p style='color:red;'>Error al cargar el catálogo de SQLite.</p>";
                 }
+            });
+
+            function renderPerfumes(list) {
+                const container = document.getElementById('catalog-grid');
+                if (list.length === 0) {
+                    container.innerHTML = "<p>No se encontraron perfumes con ese criterio.</p>";
+                    return;
+                }
+
+                let html = '';
+                list.forEach(p => {
+                    html += `
+                        <div class="card">
+                            <span class="brand">${p.brand}</span>
+                            <h3 class="name">${p.name}</h3>
+                            <div class="notes">
+                                <b>Salida:</b> ${p.top_notes.map(n => `<span class="tag">${n}</span>`).join('')}<br>
+                                <b>Corazón:</b> ${p.heart_notes.map(n => `<span class="tag">${n}</span>`).join('')}<br>
+                                <b>Fondo:</b> ${p.base_notes.map(n => `<span class="tag">${n}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
             }
-            cargarCatalogo();
+
+            function filtrarPerfumes() {
+                const query = document.getElementById('search-input').value.toLowerCase();
+                const filtered = perfumesData.filter(p => 
+                    p.name.toLowerCase().includes(query) ||
+                    p.brand.toLowerCase().includes(query) ||
+                    p.top_notes.some(n => n.toLowerCase().includes(query)) ||
+                    p.heart_notes.some(n => n.toLowerCase().includes(query)) ||
+                    p.base_notes.some(n => n.toLowerCase().includes(query))
+                );
+                renderPerfumes(filtered);
+            }
         </script>
     </body>
     </html>

@@ -1,10 +1,13 @@
+import os
 import httpx
 from typing import List, Dict
 from fastapi import HTTPException
 from app.models import RecommendationItem
 
-# URL base del microservicio de catálogo (en local corre en el puerto 8000)
-CATALOG_SERVICE_URL = "http://127.0.0.1:8000/api/v1/perfumes"
+# Lee la URL desde la variable de entorno de Docker Compose.
+# Si no existe, usa por defecto el nombre del servicio en la red de Docker (catalog-service).
+BASE_CATALOG_URL = os.getenv("CATALOG_SERVICE_URL", "http://catalog-service:8000")
+CATALOG_SERVICE_URL = f"{BASE_CATALOG_URL.rstrip('/')}/api/v1/perfumes"
 
 async def fetch_catalog() -> List[Dict]:
     """Consulta de forma asíncrona el microservicio de catálogo."""

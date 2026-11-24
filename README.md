@@ -183,7 +183,7 @@ La infraestructura en la nube de **ScentCraft** se ha definido y gestionado de f
 
 #### Evidencias de Despliegue y Reconciliación
 - **Despliegue y acceso SSH a la VM:**
-  ![Conexión SSH](docs/img/SSH.png)
+  ![Conexión SSH](docs/img/SSH_Captura.png)
 - **Detección y corrección de deriva (*Drift Detection*):**
   ![Drift Detection](docs/img/Drift1.png)
   ![Drift Detection](docs/img/Drift2.png)
@@ -192,3 +192,5 @@ La infraestructura en la nube de **ScentCraft** se ha definido y gestionado de f
 - **Recursos provisionados en Azure (`spaincentral`):**
   ![Recursos Azure](docs/img/Recursos.png)
   ![Recursos Azure](docs/img/Recursos2.png)
+  - **Destrucción limpia de la infraestructura (`terraform destroy`):**
+  ![Destrucción de recursos](docs/img/Destroy.png)

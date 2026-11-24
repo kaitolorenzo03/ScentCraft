@@ -192,3 +192,5 @@ La infraestructura en la nube de **ScentCraft** se ha definido y gestionado de f
 - **Recursos provisionados en Azure (`spaincentral`):**
   ![Recursos Azure](docs/img/Recursos.png)
   ![Recursos Azure](docs/img/Recursos2.png)
+  - **Destrucción limpia de la infraestructura (`terraform destroy`):**
+  ![Destrucción de recursos](docs/img/Destroy.png)

@@ -163,4 +163,20 @@ Para compilar los `Dockerfile` con usuario no-root (`appuser`) y arrancar todos 
 docker compose up --build -d  
 
 
+## Hito 3: Infraestructura como Código (IaC) en Azure
+
+La infraestructura en la nube de **ScentCraft** se ha definido y gestionado de forma declarativa mediante **Terraform** sobre **Microsoft Azure** (región `spaincentral`), siguiendo una arquitectura modular en el directorio `infra/`:
+
+- **`infra/providers.tf`**: Configura el proveedor `azurerm` (`~> 4.0`) y un **backend remoto** en Azure Blob Storage (`stscentcraftkaito2026/tfstate`) para garantizar la persistencia centralizada y el bloqueo de estado (*state locking*) fuera del control de versiones.
+- **`infra/variables.tf`**: Parametriza la región (`spaincentral`), el tamaño de instancia (`Standard_B2ats_v2`, 2 vCPUs / 1 GiB RAM) y las credenciales SSH.
+- **`infra/main.tf`**: Provisiona el grupo de recursos (`rg-scentcraft-infra`), red virtual (`10.0.0.0/16`), subred (`10.0.1.0/24`), IP pública estática, grupo de seguridad de red (`nsg-scentcraft` con puertos `22` y `8000` habilitados) y la máquina virtual `vm-scentcraft-api` con **Ubuntu Server 24.04 LTS**.
+- **`infra/outputs.tf`**: Expone el grupo de recursos, la dirección IP pública asignada y el comando de conexión SSH.
+
+### Validación y Patrón Reconciliador (*Drift Detection*)
+
+1. **Despliegue y acceso:** Se verificó el provisionamiento de los 8 recursos mediante `terraform apply` y la conectividad por clave pública SSH contra `vm-scentcraft-api`.
+2. **Detección y corrección de deriva:** Se introdujo una regla externa no autorizada (`ReglaManualNoAutorizada`, puerto `8080`) directamente mediante Azure CLI. Al ejecutar `terraform plan` y `terraform apply`, Terraform detectó la desviación respecto al estado deseado y eliminó automáticamente la regla externa, restaurando la integridad declarativa del firewall.
+3. **Limpieza de recursos:** Finalizadas las pruebas, se ejecutó `terraform destroy` para liberar todos los recursos de cómputo y red.
+
+
 

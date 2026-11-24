@@ -160,9 +160,11 @@ El sistema se ejecuta en un entorno multicontenedor completamente orquestado con
 Para compilar los `Dockerfile` con usuario no-root (`appuser`) y arrancar todos los servicios en segundo plano:
 
 ```powershell
-docker compose up --build -d  
+docker compose up --build -d
 
 
+```
+---
 ## Hito 3: Infraestructura como Código (IaC) en Azure
 
 La infraestructura en la nube de **ScentCraft** se ha definido y gestionado de forma declarativa mediante **Terraform** sobre **Microsoft Azure** (región `spaincentral`), siguiendo una arquitectura modular en el directorio `infra/`:

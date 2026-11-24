@@ -181,4 +181,10 @@ La infraestructura en la nube de **ScentCraft** se ha definido y gestionado de f
 3. **Limpieza de recursos:** Finalizadas las pruebas, se ejecutó `terraform destroy` para liberar todos los recursos de cómputo y red.
 
 
-
+#### Evidencias de Despliegue y Reconciliación
+- **Despliegue y acceso SSH a la VM:**
+  ![Conexión SSH](docs/img/hito3-SSH.png)
+- **Detección y corrección de deriva (*Drift Detection*):**
+  ![Drift Detection](docs/img/hito3-drift.png)
+- **Recursos provisionados en Azure (`spaincentral`):**
+  ![Recursos Azure](docs/img/hito3-azure-recursos.png)
